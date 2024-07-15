@@ -3,6 +3,7 @@ package com.example.demo.service;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.SimpleMailMessage;
@@ -20,6 +21,7 @@ import java.nio.charset.StandardCharsets;
  **/
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EmailService {
 
     private final JavaMailSender mailSender;
@@ -45,23 +47,30 @@ public class EmailService {
         mailSender.send(message);
     }
 
-    public void sendHtmlMail() throws MessagingException {
+    public void sendHtmlMail() {
+        log.info("Email send request received");
         MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(
-            message,MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
-            StandardCharsets.UTF_8.name());
-        String html = """
-            <html>
-                <body>
-                    <h1>Test</h1>
-                    <h2>Test2</h2>
-                    <h3>Test3</h3>
-               </body>
-            </html>
-            """;
-        helper.setSubject("Test");
-        helper.setText(html,true);
-        helper.setTo("buzzozads@gmail.com");
-        mailSender.send(message);
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(
+                message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
+                StandardCharsets.UTF_8.name());
+            String html = """
+                <html>
+                    <body>
+                        <h1>Test</h1>
+                        <h2>Test2</h2>
+                        <h3>Test3</h3>
+                   </body>
+                </html>
+                """;
+            helper.setSubject("Test");
+            helper.setText(html, true);
+            helper.setTo("buzzozads@gmail.com");
+            mailSender.send(message);
+            log.info("Email sent successfully");
+        }catch (Exception e){
+            log.warn("Please check your credentials");
+            log.error("Email could not be sent successfully");
+        }
     }
 }
