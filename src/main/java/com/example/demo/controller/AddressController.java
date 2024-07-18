@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,11 +34,13 @@ public class AddressController {
         return ResponseEntity.ok(addressService.save(request));
     }
     @GetMapping("/fetch")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     public ResponseEntity<List<AddressResponseDTO>> fetch() {
         return ResponseEntity.ok(addressService.findAllAddress());
     }
 
     @GetMapping("/get")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<AddressResponseDTO> getAddress(@RequestParam("id") Integer id) {
         return ResponseEntity.ok(addressService.findAddressById(id));
     }
